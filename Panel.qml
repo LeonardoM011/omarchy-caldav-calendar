@@ -4,6 +4,7 @@ import Quickshell
 import qs.Commons
 import qs.Ui
 import "CalendarModel.js" as Model
+import "ServiceBridge.js" as Bridge
 
 Panel {
   id: root
@@ -14,7 +15,8 @@ Panel {
   property var anchorItem: null
   property var hostWidget: null
   readonly property var barIdentity: hostWidget || root
-  readonly property var calendarService: bar && bar.shell ? bar.shell.serviceFor(root.moduleName) : null
+  property var bridgedService: null
+  readonly property var calendarService: (bar && bar.shell ? bar.shell.serviceFor(root.moduleName) : null) || bridgedService
 
   property date today: new Date()
   readonly property string todayKey: Model.keyForDate(today)
@@ -729,6 +731,14 @@ Panel {
 
   function openEvolution() {
     if (root.bar) root.bar.run("evolution -c calendar")
+  }
+
+  Timer {
+    interval: 1000
+    repeat: true
+    triggeredOnStart: true
+    running: !root.calendarService
+    onTriggered: root.bridgedService = Bridge.current()
   }
 
   Timer {

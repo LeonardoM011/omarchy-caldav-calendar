@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "CalendarModel.js" as Model
+import "ServiceBridge.js" as Bridge
 
 Item {
   id: root
@@ -749,7 +750,12 @@ Item {
     onTriggered: root.checkReminders()
   }
 
-  Component.onCompleted: root.bootReminders()
+  Component.onCompleted: {
+    Bridge.publish(root)
+    root.bootReminders()
+  }
+
+  Component.onDestruction: Bridge.retract(root)
 
   Timer {
     id: snapshotTimeout
